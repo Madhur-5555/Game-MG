@@ -49,4 +49,63 @@
           obs.y < player.y + player.height &&
           obs.y + obs.height > player.y
         ) {
-          gameOver
+          gameOver = true;
+        }
+      }
+      obstacles = obstacles.filter(o => o.y < canvas.height);
+    }
+
+    function drawScore() {
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.fillText('Score: ' + score, 10, 30);
+    }
+
+    function gameLoop() {
+      if (gameOver) {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'red';
+        ctx.font = '40px Arial';
+        ctx.fillText('Game Over!', 100, 250);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText('Score: ' + score, 150, 300);
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      player.vy += gravity;
+      player.y += player.vy;
+
+      if (player.y > 500) {
+        player.y = 500;
+        player.jump = false;
+      }
+
+      drawPlayer();
+      drawObstacles();
+      updateObstacles();
+      drawScore();
+
+      score++;
+      if (score % 50 === 0) spawnObstacle();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && player.x > 10) player.x -= 130;
+      if (e.key === 'ArrowRight' && player.x < 260) player.x += 130;
+      if (e.key === ' ' && !player.jump) {
+        player.vy = -10;
+        player.jump = true;
+        jumpSound.currentTime = 0;
+        jumpSound.play();
+      }
+    });
+
+    gameLoop();
+  </script></body>
+</html>
